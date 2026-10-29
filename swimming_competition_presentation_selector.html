@@ -1,0 +1,1089 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Orange Team 50m Presentation Swim-Off</title>
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            swimOrange: '#ff6200',
+            swimOrangeDark: '#e05300',
+            swimOrangeLight: '#ff8533',
+            poolCyan: '#06b6d4',
+            poolDeep: '#0284c7',
+            poolBed: '#034569',
+          },
+          keyframes: {
+            waterShimmer: {
+              '0%': { backgroundPosition: '0% 50%' },
+              '100%': { backgroundPosition: '100% 50%' }
+            },
+            touchWallGlow: {
+              '0%, 100%': { boxShadow: '0 0 15px rgba(239, 68, 68, 0.4)' },
+              '50%': { boxShadow: '0 0 30px rgba(251, 191, 36, 0.8)' }
+            }
+          },
+          animation: {
+            'water-shimmer': 'waterShimmer 12s linear infinite',
+            'wall-glow': 'touchWallGlow 2s ease-in-out infinite'
+          }
+        }
+      }
+    }
+  </script>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@600;800&display=swap');
+
+    body {
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      user-select: none;
+      -webkit-user-select: none;
+    }
+
+    .font-mono-code {
+      font-family: 'JetBrains Mono', monospace;
+    }
+
+    /* Water caustics & wavy motion */
+    .pool-water-surface {
+      background: linear-gradient(
+        135deg,
+        #0369a1 0%,
+        #0284c7 25%,
+        #0ea5e9 50%,
+        #0284c7 75%,
+        #0369a1 100%
+      );
+      background-size: 400% 400%;
+    }
+
+    .water-texture-overlay {
+      background: repeating-linear-gradient(
+        55deg,
+        rgba(255, 255, 255, 0.05) 0px,
+        rgba(255, 255, 255, 0.05) 12px,
+        transparent 12px,
+        transparent 28px
+      );
+    }
+
+    /* Olympic lane dividing rope with floats */
+    .lane-rope-divider {
+      height: 8px;
+      background: repeating-linear-gradient(
+        to right,
+        #ef4444 0px,
+        #ef4444 14px,
+        #ffffff 14px,
+        #ffffff 24px,
+        #38bdf8 24px,
+        #38bdf8 38px
+      );
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.4);
+    }
+
+    /* Realistic swimming freestyle bob & roll */
+    @keyframes swimFreestyle {
+      0% { transform: translateY(0px) rotate(0deg) scaleY(1); }
+      25% { transform: translateY(-4px) rotate(3deg) scaleY(0.96); }
+      50% { transform: translateY(1px) rotate(0deg) scaleY(1.02); }
+      75% { transform: translateY(4px) rotate(-3deg) scaleY(0.96); }
+      100% { transform: translateY(0px) rotate(0deg) scaleY(1); }
+    }
+
+    .swimming-active {
+      animation: swimFreestyle 0.45s ease-in-out infinite;
+    }
+
+    /* Trailing wake bubbles */
+    .wake-trail {
+      background: radial-gradient(circle, rgba(255,255,255,0.7) 10%, rgba(56,189,248,0.4) 40%, transparent 80%);
+      filter: blur(2px);
+    }
+
+    /* Distance vertical marker line */
+    .distance-line {
+      position: absolute;
+      top: 0;
+      bottom: 0;
+      width: 2px;
+      pointer-events: none;
+      border-left: 2px dashed rgba(255, 255, 255, 0.28);
+      z-index: 5;
+    }
+
+    /* Touch pad strip */
+    .touch-pad-strip {
+      background: repeating-linear-gradient(
+        0deg,
+        #ef4444 0px,
+        #ef4444 16px,
+        #fbbf24 16px,
+        #fbbf24 32px
+      );
+    }
+  </style>
+</head>
+<body class="bg-[#090d16] text-slate-100 min-h-screen flex flex-col p-3 md:p-6 antialiased selection:bg-swimOrange selection:text-white">
+
+  <!-- Header Banner -->
+  <header class="max-w-7xl w-full mx-auto mb-4 flex flex-col md:flex-row items-center justify-between gap-4 border-b border-slate-800/80 pb-4">
+    <div class="flex items-center gap-3">
+      <div class="w-12 h-12 rounded-2xl bg-gradient-to-tr from-swimOrange to-amber-400 flex items-center justify-center shadow-lg shadow-orange-500/20 text-2xl">
+        🏊
+      </div>
+      <div>
+        <div class="flex items-center gap-2">
+          <h1 class="text-xl md:text-2xl font-black tracking-tight text-white">ORANGE SQUAD 50M REGATTA</h1>
+          <span class="px-2.5 py-0.5 text-xs font-extrabold uppercase rounded-full bg-swimOrange/20 border border-swimOrange/40 text-swimOrange tracking-wide">
+            Live Presentation Draw
+          </span>
+        </div>
+        <p class="text-xs md:text-sm text-slate-400 font-medium">Order of wall touch-in assigns presentation sections #1 to #5 top-down!</p>
+      </div>
+    </div>
+
+    <!-- Controls, Pace Selector & Clock -->
+    <div class="flex flex-wrap items-center justify-end gap-3 bg-slate-900/90 border border-slate-800 p-2.5 rounded-2xl shadow-inner">
+      <!-- Race Pace Selector -->
+      <div class="flex items-center gap-1.5 bg-slate-950/80 px-2.5 py-1.5 rounded-xl border border-slate-800">
+        <label for="pace-select" class="text-[10px] uppercase font-bold text-slate-400">Pace:</label>
+        <select id="pace-select" onchange="changePace(this.value)" class="bg-transparent text-xs font-bold text-amber-400 outline-none cursor-pointer">
+          <option value="dramatic" class="bg-slate-900 text-slate-100" selected>Dramatic (~24s)</option>
+          <option value="standard" class="bg-slate-900 text-slate-100">Standard (~15s)</option>
+          <option value="quick" class="bg-slate-900 text-slate-100">Sprint (~8s)</option>
+        </select>
+      </div>
+
+      <!-- Live Split Clock -->
+      <div class="px-3 py-1 bg-black/70 rounded-xl border border-slate-800/80 text-center min-w-[95px]">
+        <div class="text-[9px] uppercase font-bold text-slate-400">Stopwatch</div>
+        <div id="race-clock" class="font-mono-code text-lg font-black text-amber-400">00:00.00</div>
+      </div>
+
+      <!-- Action Buttons -->
+      <div class="flex items-center gap-2">
+        <button id="btn-start" onclick="toggleRace()" class="px-4 py-2 bg-gradient-to-r from-swimOrange to-amber-500 hover:from-swimOrangeDark hover:to-amber-600 text-white font-bold text-sm rounded-xl transition shadow-md shadow-orange-500/25 active:scale-95 flex items-center gap-2 cursor-pointer">
+          <span id="start-icon">▶</span>
+          <span id="start-label">Start Race</span>
+        </button>
+
+        <button id="btn-reset" onclick="resetRace()" class="px-3.5 py-2 bg-slate-800 hover:bg-slate-700 text-slate-200 font-semibold text-sm rounded-xl transition border border-slate-700/60 active:scale-95 flex items-center gap-1.5 cursor-pointer">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/></svg>
+          <span>Reset</span>
+        </button>
+
+        <button id="btn-sound" onclick="toggleSound()" class="p-2 bg-slate-800 hover:bg-slate-700 text-slate-300 rounded-xl border border-slate-700/60 transition cursor-pointer" title="Toggle Sound">
+          <span id="sound-icon">🔊</span>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- Main Content Grid -->
+  <main class="max-w-7xl w-full mx-auto flex-1 grid grid-cols-1 lg:grid-cols-12 gap-5 pb-4">
+
+    <!-- Left: Olympic Extended Swimming Pool (7 cols) -->
+    <section class="lg:col-span-7 flex flex-col gap-3">
+      <div class="bg-slate-900/90 border border-slate-800 rounded-3xl p-3 md:p-4 shadow-2xl flex flex-col h-full relative overflow-hidden backdrop-blur-md">
+        
+        <!-- Pool Header Info -->
+        <div class="flex items-center justify-between mb-3 text-xs font-semibold px-2">
+          <div class="flex items-center gap-2 text-slate-400">
+            <span class="inline-block w-2.5 h-2.5 rounded-full bg-emerald-400 animate-pulse"></span>
+            <span>Olympic 50-Meter Standard Long-Course</span>
+          </div>
+          <div class="flex items-center gap-2">
+            <span class="text-slate-400">Uniform:</span>
+            <span class="px-2 py-0.5 rounded-md bg-swimOrange/20 text-swimOrange border border-swimOrange/40 font-bold">Orange Shirts & Caps</span>
+          </div>
+        </div>
+
+        <!-- Pool Canvas / Track Area with Full Width Horizontal Perspective -->
+        <div id="pool-outer" class="relative flex-1 bg-sky-950 rounded-2xl border-4 border-slate-700/80 shadow-2xl overflow-hidden flex flex-col min-h-[460px]">
+          
+          <!-- Pool Deck Starting Blocks (Left) -->
+          <div class="absolute top-0 bottom-0 left-0 w-12 bg-gradient-to-r from-amber-700 via-amber-800 to-amber-950 border-r-4 border-amber-950 flex flex-col justify-around z-20 shadow-md">
+            <div class="h-1/5 flex items-center justify-center font-black text-xs text-amber-200">#1</div>
+            <div class="h-1/5 flex items-center justify-center font-black text-xs text-amber-200">#2</div>
+            <div class="h-1/5 flex items-center justify-center font-black text-xs text-amber-200">#3</div>
+            <div class="h-1/5 flex items-center justify-center font-black text-xs text-amber-200">#4</div>
+            <div class="h-1/5 flex items-center justify-center font-black text-xs text-amber-200">#5</div>
+          </div>
+
+          <!-- Pool Deck Finish Wall Touchpad (Right) -->
+          <div id="touch-wall" class="absolute top-0 bottom-0 right-0 w-12 touch-pad-strip border-l-4 border-red-950 z-20 flex flex-col justify-center items-center shadow-2xl animate-wall-glow">
+            <div class="transform rotate-90 text-[10px] font-black tracking-widest text-black/90 uppercase whitespace-nowrap drop-shadow-md">
+              TOUCH SENSOR
+            </div>
+          </div>
+
+          <!-- Distance Split Guides -->
+          <div class="distance-line left-[25%]"><span class="absolute top-1 -left-3 text-[9px] font-mono-code font-bold text-white/40 bg-black/40 px-1 rounded">10m</span></div>
+          <div class="distance-line left-[50%]"><span class="absolute top-1 -left-3 text-[9px] font-mono-code font-bold text-amber-300/60 bg-black/50 px-1 rounded">25m</span></div>
+          <div class="distance-line left-[75%]"><span class="absolute top-1 -left-3 text-[9px] font-mono-code font-bold text-white/40 bg-black/40 px-1 rounded">40m</span></div>
+
+          <!-- Water Lanes Container -->
+          <div id="pool-lanes" class="relative w-full h-full flex flex-col pool-water-surface water-texture-overlay pl-12 pr-12 animate-water-shimmer">
+            
+            <!-- Lane 1: Adelynn -->
+            <div class="lane-track relative flex-1 flex items-center border-b border-sky-400/20" id="track-0">
+              <span class="absolute left-2 text-[10px] font-extrabold text-white/35 tracking-wider">LANE 1</span>
+              <div class="swimmer-entity absolute left-0 flex items-center gap-2 z-10 transition-transform duration-75" id="swimmer-0">
+                <!-- Wake water spray -->
+                <div class="wake-trail -mr-2 w-8 h-4 rounded-full opacity-60"></div>
+                <div class="swimmer-avatar relative w-10 h-10 rounded-full bg-gradient-to-br from-amber-400 via-swimOrange to-red-600 border-2 border-white shadow-xl flex items-center justify-center text-white text-sm font-black ring-2 ring-swimOrange/60">
+                  <span class="z-10">🏊</span>
+                  <div class="splash-ring absolute inset-0 rounded-full bg-cyan-300 opacity-0 pointer-events-none"></div>
+                </div>
+                <div class="bg-black/70 backdrop-blur-sm border border-orange-500/50 text-orange-200 font-extrabold text-xs px-2.5 py-0.5 rounded-full shadow-md whitespace-nowrap">
+                  Adelynn
+                </div>
+              </div>
+            </div>
+
+            <!-- Lane Rope Divider -->
+            <div class="lane-rope-divider w-full"></div>
+
+            <!-- Lane 2: Em -->
+            <div class="lane-track relative flex-1 flex items-center border-b border-sky-400/20" id="track-1">
+              <span class="absolute left-2 text-[10px] font-extrabold text-white/35 tracking-wider">LANE 2</span>
+              <div class="swimmer-entity absolute left-0 flex items-center gap-2 z-10 transition-transform duration-75" id="swimmer-1">
+                <div class="wake-trail -mr-2 w-8 h-4 rounded-full opacity-60"></div>
+                <div class="swimmer-avatar relative w-10 h-10 rounded-full bg-gradient-to-br from-amber-400 via-swimOrange to-red-600 border-2 border-white shadow-xl flex items-center justify-center text-white text-sm font-black ring-2 ring-swimOrange/60">
+                  <span class="z-10">🏊</span>
+                  <div class="splash-ring absolute inset-0 rounded-full bg-cyan-300 opacity-0 pointer-events-none"></div>
+                </div>
+                <div class="bg-black/70 backdrop-blur-sm border border-orange-500/50 text-orange-200 font-extrabold text-xs px-2.5 py-0.5 rounded-full shadow-md whitespace-nowrap">
+                  Em
+                </div>
+              </div>
+            </div>
+
+            <!-- Lane Rope Divider -->
+            <div class="lane-rope-divider w-full"></div>
+
+            <!-- Lane 3: Ray -->
+            <div class="lane-track relative flex-1 flex items-center border-b border-sky-400/20" id="track-2">
+              <span class="absolute left-2 text-[10px] font-extrabold text-white/35 tracking-wider">LANE 3</span>
+              <div class="swimmer-entity absolute left-0 flex items-center gap-2 z-10 transition-transform duration-75" id="swimmer-2">
+                <div class="wake-trail -mr-2 w-8 h-4 rounded-full opacity-60"></div>
+                <div class="swimmer-avatar relative w-10 h-10 rounded-full bg-gradient-to-br from-amber-400 via-swimOrange to-red-600 border-2 border-white shadow-xl flex items-center justify-center text-white text-sm font-black ring-2 ring-swimOrange/60">
+                  <span class="z-10">🏊</span>
+                  <div class="splash-ring absolute inset-0 rounded-full bg-cyan-300 opacity-0 pointer-events-none"></div>
+                </div>
+                <div class="bg-black/70 backdrop-blur-sm border border-orange-500/50 text-orange-200 font-extrabold text-xs px-2.5 py-0.5 rounded-full shadow-md whitespace-nowrap">
+                  Ray
+                </div>
+              </div>
+            </div>
+
+            <!-- Lane Rope Divider -->
+            <div class="lane-rope-divider w-full"></div>
+
+            <!-- Lane 4: Bob -->
+            <div class="lane-track relative flex-1 flex items-center border-b border-sky-400/20" id="track-3">
+              <span class="absolute left-2 text-[10px] font-extrabold text-white/35 tracking-wider">LANE 4</span>
+              <div class="swimmer-entity absolute left-0 flex items-center gap-2 z-10 transition-transform duration-75" id="swimmer-3">
+                <div class="wake-trail -mr-2 w-8 h-4 rounded-full opacity-60"></div>
+                <div class="swimmer-avatar relative w-10 h-10 rounded-full bg-gradient-to-br from-amber-400 via-swimOrange to-red-600 border-2 border-white shadow-xl flex items-center justify-center text-white text-sm font-black ring-2 ring-swimOrange/60">
+                  <span class="z-10">🏊</span>
+                  <div class="splash-ring absolute inset-0 rounded-full bg-cyan-300 opacity-0 pointer-events-none"></div>
+                </div>
+                <div class="bg-black/70 backdrop-blur-sm border border-orange-500/50 text-orange-200 font-extrabold text-xs px-2.5 py-0.5 rounded-full shadow-md whitespace-nowrap">
+                  Bob
+                </div>
+              </div>
+            </div>
+
+            <!-- Lane Rope Divider -->
+            <div class="lane-rope-divider w-full"></div>
+
+            <!-- Lane 5: Maria -->
+            <div class="lane-track relative flex-1 flex items-center" id="track-4">
+              <span class="absolute left-2 text-[10px] font-extrabold text-white/35 tracking-wider">LANE 5</span>
+              <div class="swimmer-entity absolute left-0 flex items-center gap-2 z-10 transition-transform duration-75" id="swimmer-4">
+                <div class="wake-trail -mr-2 w-8 h-4 rounded-full opacity-60"></div>
+                <div class="swimmer-avatar relative w-10 h-10 rounded-full bg-gradient-to-br from-amber-400 via-swimOrange to-red-600 border-2 border-white shadow-xl flex items-center justify-center text-white text-sm font-black ring-2 ring-swimOrange/60">
+                  <span class="z-10">🏊</span>
+                  <div class="splash-ring absolute inset-0 rounded-full bg-cyan-300 opacity-0 pointer-events-none"></div>
+                </div>
+                <div class="bg-black/70 backdrop-blur-sm border border-orange-500/50 text-orange-200 font-extrabold text-xs px-2.5 py-0.5 rounded-full shadow-md whitespace-nowrap">
+                  Maria
+                </div>
+              </div>
+            </div>
+
+          </div>
+        </div>
+
+        <!-- Swimming Info Bar -->
+        <div class="mt-3 flex items-center justify-between text-xs text-slate-400 px-1">
+          <div class="flex items-center gap-3">
+            <span class="flex items-center gap-1.5"><span class="w-2 h-2 rounded-full bg-swimOrange"></span> 5 Swimmers in Orange Shirts</span>
+            <span class="hidden sm:inline text-slate-600">|</span>
+            <span class="hidden sm:inline">Dynamic lead changes with surge stamina</span>
+          </div>
+          <div id="race-stage-text" class="font-bold text-slate-300">Swimmers on starting blocks</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Right: Presentation Lineup Top-Down Board (5 cols) -->
+    <section class="lg:col-span-5 flex flex-col">
+      <div class="bg-slate-900/90 border border-slate-800 rounded-3xl p-4 md:p-5 shadow-2xl flex flex-col h-full backdrop-blur-md">
+        
+        <div class="flex items-center justify-between border-b border-slate-800 pb-3 mb-4">
+          <div>
+            <h2 class="text-base font-extrabold tracking-tight text-white flex items-center gap-2">
+              <span>📋 Presentation Lineup</span>
+              <span class="text-xs px-2 py-0.5 rounded-md bg-blue-500/20 text-blue-400 border border-blue-500/30 font-semibold">Top-Down Order</span>
+            </h2>
+            <p class="text-xs text-slate-400 mt-0.5">Assigned in sequential order of touching the wall</p>
+          </div>
+          <div id="assignment-counter" class="text-xs font-mono-code font-bold bg-slate-800 px-2 py-1 rounded-lg text-slate-300">
+            0/5 LOCKED
+          </div>
+        </div>
+
+        <!-- The 5 Sequential Presentation Slots -->
+        <div class="space-y-2.5 flex-1 flex flex-col justify-between">
+          
+          <!-- Slot 1: HOOK -->
+          <div id="slot-card-0" class="group relative rounded-2xl p-3 border transition-all duration-300 bg-slate-950/60 border-slate-800/80">
+            <div class="flex items-start justify-between">
+              <div class="flex items-center gap-2.5">
+                <span class="w-6 h-6 rounded-lg bg-sky-500/20 text-sky-400 border border-sky-500/40 font-black text-xs flex items-center justify-center">1</span>
+                <div>
+                  <div class="text-xs font-black tracking-wide text-sky-400 uppercase">HOOK</div>
+                  <div class="text-[11px] text-slate-400 font-medium">Capture Attention</div>
+                </div>
+              </div>
+              <span class="text-[10px] font-mono-code font-bold text-slate-500 px-2 py-0.5 rounded bg-slate-900 border border-slate-800">1st Place</span>
+            </div>
+            
+            <div class="mt-2 pt-2 border-t border-slate-800/60 flex items-center justify-between">
+              <div id="speaker-slot-0" class="flex items-center gap-2 text-sm font-bold text-slate-500 italic">
+                <span>Waiting for 1st touch...</span>
+              </div>
+              <div id="time-slot-0" class="text-xs font-mono-code text-slate-500 font-semibold">--:--.--</div>
+            </div>
+          </div>
+
+          <!-- Slot 2: WHY -->
+          <div id="slot-card-1" class="group relative rounded-2xl p-3 border transition-all duration-300 bg-slate-950/60 border-slate-800/80">
+            <div class="flex items-start justify-between">
+              <div class="flex items-center gap-2.5">
+                <span class="w-6 h-6 rounded-lg bg-sky-500/20 text-sky-400 border border-sky-500/40 font-black text-xs flex items-center justify-center">2</span>
+                <div>
+                  <div class="text-xs font-black tracking-wide text-sky-400 uppercase">WHY</div>
+                  <div class="text-[11px] text-slate-400 font-medium">WIIFM (What's In It For Me)</div>
+                </div>
+              </div>
+              <span class="text-[10px] font-mono-code font-bold text-slate-500 px-2 py-0.5 rounded bg-slate-900 border border-slate-800">2nd Place</span>
+            </div>
+            
+            <div class="mt-2 pt-2 border-t border-slate-800/60 flex items-center justify-between">
+              <div id="speaker-slot-1" class="flex items-center gap-2 text-sm font-bold text-slate-500 italic">
+                <span>Waiting for 2nd touch...</span>
+              </div>
+              <div id="time-slot-1" class="text-xs font-mono-code text-slate-500 font-semibold">--:--.--</div>
+            </div>
+          </div>
+
+          <!-- Slot 3: WHAT IS IT? -->
+          <div id="slot-card-2" class="group relative rounded-2xl p-3 border transition-all duration-300 bg-slate-950/60 border-slate-800/80">
+            <div class="flex items-start justify-between">
+              <div class="flex items-center gap-2.5">
+                <span class="w-6 h-6 rounded-lg bg-sky-500/20 text-sky-400 border border-sky-500/40 font-black text-xs flex items-center justify-center">3</span>
+                <div>
+                  <div class="text-xs font-black tracking-wide text-sky-400 uppercase">WHAT IS IT?</div>
+                  <div class="text-[11px] text-slate-400 font-medium">Anchoring Core Message</div>
+                </div>
+              </div>
+              <span class="text-[10px] font-mono-code font-bold text-slate-500 px-2 py-0.5 rounded bg-slate-900 border border-slate-800">3rd Place</span>
+            </div>
+            
+            <div class="mt-2 pt-2 border-t border-slate-800/60 flex items-center justify-between">
+              <div id="speaker-slot-2" class="flex items-center gap-2 text-sm font-bold text-slate-500 italic">
+                <span>Waiting for 3rd touch...</span>
+              </div>
+              <div id="time-slot-2" class="text-xs font-mono-code text-slate-500 font-semibold">--:--.--</div>
+            </div>
+          </div>
+
+          <!-- Slot 4: HOW -->
+          <div id="slot-card-3" class="group relative rounded-2xl p-3 border transition-all duration-300 bg-slate-950/60 border-slate-800/80">
+            <div class="flex items-start justify-between">
+              <div class="flex items-center gap-2.5">
+                <span class="w-6 h-6 rounded-lg bg-sky-500/20 text-sky-400 border border-sky-500/40 font-black text-xs flex items-center justify-center">4</span>
+                <div>
+                  <div class="text-xs font-black tracking-wide text-sky-400 uppercase">HOW</div>
+                  <div class="text-[11px] text-slate-400 font-medium">Steps & Implementation</div>
+                </div>
+              </div>
+              <span class="text-[10px] font-mono-code font-bold text-slate-500 px-2 py-0.5 rounded bg-slate-900 border border-slate-800">4th Place</span>
+            </div>
+            
+            <div class="mt-2 pt-2 border-t border-slate-800/60 flex items-center justify-between">
+              <div id="speaker-slot-3" class="flex items-center gap-2 text-sm font-bold text-slate-500 italic">
+                <span>Waiting for 4th touch...</span>
+              </div>
+              <div id="time-slot-3" class="text-xs font-mono-code text-slate-500 font-semibold">--:--.--</div>
+            </div>
+          </div>
+
+          <!-- Slot 5: RECAP - CTA -->
+          <div id="slot-card-4" class="group relative rounded-2xl p-3 border transition-all duration-300 bg-slate-950/60 border-slate-800/80">
+            <div class="flex items-start justify-between">
+              <div class="flex items-center gap-2.5">
+                <span class="w-6 h-6 rounded-lg bg-sky-500/20 text-sky-400 border border-sky-500/40 font-black text-xs flex items-center justify-center">5</span>
+                <div>
+                  <div class="text-xs font-black tracking-wide text-sky-400 uppercase">RECAP — CTA</div>
+                  <div class="text-[11px] text-slate-400 font-medium">Summary & Call To Action</div>
+                </div>
+              </div>
+              <span class="text-[10px] font-mono-code font-bold text-slate-500 px-2 py-0.5 rounded bg-slate-900 border border-slate-800">5th Place</span>
+            </div>
+            
+            <div class="mt-2 pt-2 border-t border-slate-800/60 flex items-center justify-between">
+              <div id="speaker-slot-4" class="flex items-center gap-2 text-sm font-bold text-slate-500 italic">
+                <span>Waiting for 5th touch...</span>
+              </div>
+              <div id="time-slot-4" class="text-xs font-mono-code text-slate-500 font-semibold">--:--.--</div>
+            </div>
+          </div>
+
+        </div>
+
+        <!-- Action Buttons: Download Image & Copy Agenda -->
+        <div class="mt-4 flex flex-col sm:flex-row items-center gap-2">
+          <!-- Download Image Button (reveals prominently upon completion) -->
+          <button id="download-image-btn" onclick="downloadLineupImage()" disabled class="w-full sm:w-1/2 py-2.5 px-3 rounded-xl bg-gradient-to-r from-swimOrange to-amber-500 text-white text-xs font-extrabold shadow-md shadow-orange-500/25 transition duration-200 flex items-center justify-center gap-2 cursor-pointer disabled:opacity-35 disabled:cursor-not-allowed disabled:grayscale">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/></svg>
+            <span id="download-btn-text">Download Image (PNG)</span>
+          </button>
+
+          <!-- Export / Copy Agenda Button -->
+          <button id="copy-summary-btn" onclick="copyPresentationOrder()" class="w-full sm:w-1/2 py-2.5 px-3 rounded-xl bg-slate-800 hover:bg-slate-700 border border-slate-700 text-xs font-bold text-slate-300 transition duration-150 flex items-center justify-center gap-2 cursor-pointer">
+            <svg class="w-4 h-4 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 5H6a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2v-1M8 5a2 2 0 002 2h2a2 2 0 002-2M8 5a2 2 0 012-2h2a2 2 0 012 2m0 0h2a2 2 0 012 2v3m2 4H10m0 0l3-3m-3 3l3 3"/></svg>
+            <span id="copy-btn-text">Copy Agenda</span>
+          </button>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <script>
+    // State management
+    const presentationParts = [
+      { order: 1, title: "HOOK", subtitle: "Capture Attention" },
+      { order: 2, title: "WHY", subtitle: "WIIFM (What's In It For Me)" },
+      { order: 3, title: "WHAT IS IT?", subtitle: "Anchoring Core Message" },
+      { order: 4, title: "HOW", subtitle: "Steps & Implementation" },
+      { order: 5, title: "RECAP - CTA", subtitle: "Summary & Call To Action" }
+    ];
+
+    let swimmers = [
+      { id: 0, name: "Adelynn", posX: 0, finished: false, time: null, stamina: 1.0, momentum: 1.0 },
+      { id: 1, name: "Em", posX: 0, finished: false, time: null, stamina: 1.0, momentum: 1.0 },
+      { id: 2, name: "Ray", posX: 0, finished: false, time: null, stamina: 1.0, momentum: 1.0 },
+      { id: 3, name: "Bob", posX: 0, finished: false, time: null, stamina: 1.0, momentum: 1.0 },
+      { id: 4, name: "Maria", posX: 0, finished: false, time: null, stamina: 1.0, momentum: 1.0 }
+    ];
+
+    let raceStatus = 'idle'; // 'idle', 'running', 'paused', 'completed'
+    let animationFrameId = null;
+    let startTime = 0;
+    let elapsedMilliseconds = 0;
+    let finishIndex = 0;
+    let soundEnabled = true;
+
+    // Pace multipliers: calibrated for 50m long course
+    // 'dramatic' ~ 22-26s, 'standard' ~ 14-16s, 'quick' ~ 7-9s
+    let currentPaceMode = 'dramatic';
+    const paceSpeeds = {
+      dramatic: 0.38,
+      standard: 0.65,
+      quick: 1.25
+    };
+
+    function changePace(val) {
+      currentPaceMode = val;
+    }
+
+    // Audio synthesizer using Web Audio API (100% self contained)
+    let audioCtx = null;
+
+    function getAudioContext() {
+      if (!audioCtx) {
+        const AudioContext = window.AudioContext || window.webkitAudioContext;
+        audioCtx = new AudioContext();
+      }
+      if (audioCtx.state === 'suspended') {
+        audioCtx.resume();
+      }
+      return audioCtx;
+    }
+
+    function playBuzzer() {
+      if (!soundEnabled) return;
+      try {
+        const ctx = getAudioContext();
+        const osc = ctx.createOscillator();
+        const gain = ctx.createGain();
+        osc.type = 'sawtooth';
+        osc.frequency.setValueAtTime(650, ctx.currentTime);
+        osc.frequency.exponentialRampToValueAtTime(320, ctx.currentTime + 0.35);
+        gain.gain.setValueAtTime(0.2, ctx.currentTime);
+        gain.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 0.35);
+        osc.connect(gain);
+        gain.connect(ctx.destination);
+        osc.start();
+        osc.stop(ctx.currentTime + 0.35);
+      } catch (e) {}
+    }
+
+    function playWallBeep(rank) {
+      if (!soundEnabled) return;
+      try {
+        const ctx = getAudioContext();
+        const osc = ctx.createOscillator();
+        const gain = ctx.createGain();
+        const freqs = [523.25, 659.25, 783.99, 987.77, 1046.50]; // C5, E5, G5, B5, C6
+        osc.type = 'triangle';
+        osc.frequency.setValueAtTime(freqs[Math.min(rank, 4)], ctx.currentTime);
+        gain.gain.setValueAtTime(0.25, ctx.currentTime);
+        gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.45);
+        osc.connect(gain);
+        gain.connect(ctx.destination);
+        osc.start();
+        osc.stop(ctx.currentTime + 0.45);
+      } catch (e) {}
+    }
+
+    function playFanfare() {
+      if (!soundEnabled) return;
+      try {
+        const ctx = getAudioContext();
+        const notes = [523.25, 659.25, 783.99, 1046.50];
+        notes.forEach((freq, idx) => {
+          const osc = ctx.createOscillator();
+          const gain = ctx.createGain();
+          osc.type = 'sine';
+          osc.frequency.setValueAtTime(freq, ctx.currentTime + idx * 0.12);
+          gain.gain.setValueAtTime(0.2, ctx.currentTime + idx * 0.12);
+          gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + idx * 0.12 + 0.6);
+          osc.connect(gain);
+          gain.connect(ctx.destination);
+          osc.start(ctx.currentTime + idx * 0.12);
+          osc.stop(ctx.currentTime + idx * 0.12 + 0.6);
+        });
+      } catch (e) {}
+    }
+
+    function toggleSound() {
+      soundEnabled = !soundEnabled;
+      document.getElementById('sound-icon').textContent = soundEnabled ? '🔊' : '🔇';
+      if (soundEnabled) getAudioContext();
+    }
+
+    function formatTime(ms) {
+      const minutes = Math.floor(ms / 60000);
+      const seconds = Math.floor((ms % 60000) / 1000);
+      const centis = Math.floor((ms % 1000) / 10);
+      const mStr = String(minutes).padStart(2, '0');
+      const sStr = String(seconds).padStart(2, '0');
+      const cStr = String(centis).padStart(2, '0');
+      return `${mStr}:${sStr}.${cStr}`;
+    }
+
+    function toggleRace() {
+      getAudioContext();
+      if (raceStatus === 'idle' || raceStatus === 'paused') {
+        startRace();
+      } else if (raceStatus === 'running') {
+        pauseRace();
+      }
+    }
+
+    function startRace() {
+      raceStatus = 'running';
+      document.getElementById('start-label').textContent = 'Pause';
+      document.getElementById('start-icon').textContent = '⏸';
+      document.getElementById('race-stage-text').textContent = 'Sprint underway! Lead trades in progress...';
+      document.getElementById('race-stage-text').className = 'font-bold text-amber-400 animate-pulse';
+
+      // Attach stroke animation to swimmer avatars
+      document.querySelectorAll('.swimmer-avatar').forEach(el => el.classList.add('swimming-active'));
+
+      startTime = performance.now() - elapsedMilliseconds;
+      playBuzzer();
+
+      runSimulation();
+    }
+
+    function pauseRace() {
+      raceStatus = 'paused';
+      cancelAnimationFrame(animationFrameId);
+      document.getElementById('start-label').textContent = 'Resume';
+      document.getElementById('start-icon').textContent = '▶';
+      document.getElementById('race-stage-text').textContent = 'Race paused';
+      document.getElementById('race-stage-text').className = 'font-bold text-slate-300';
+      document.querySelectorAll('.swimmer-avatar').forEach(el => el.classList.remove('swimming-active'));
+    }
+
+    function runSimulation() {
+      if (raceStatus !== 'running') return;
+
+      const now = performance.now();
+      elapsedMilliseconds = now - startTime;
+      document.getElementById('race-clock').textContent = formatTime(elapsedMilliseconds);
+
+      const trackElem = document.getElementById('track-0');
+      const trackWidth = trackElem.clientWidth;
+      const maxPosition = Math.max(100, trackWidth - 110);
+
+      const speedMultiplier = paceSpeeds[currentPaceMode] || 0.38;
+      let allFinished = true;
+
+      swimmers.forEach(s => {
+        if (!s.finished) {
+          allFinished = false;
+
+          // Randomized natural swimming surges & fatigue:
+          // Occasional burst of acceleration or breathing recovery
+          if (Math.random() < 0.04) {
+            s.momentum = 0.82 + Math.random() * 0.45;
+          }
+
+          // Gradual fatigue or catch-up kick
+          const progressRatio = s.posX / maxPosition;
+          let kickSurge = 1.0;
+          if (progressRatio > 0.75 && Math.random() < 0.1) {
+            kickSurge = 1.15; // final 15m finishing kick!
+          }
+
+          const strokeVelocity = (1.4 + Math.sin(now * 0.005 + s.id) * 0.35 + (Math.random() - 0.45) * 0.3) * s.momentum * kickSurge;
+          s.posX += strokeVelocity * speedMultiplier;
+
+          // Check for wall sensor touch
+          if (s.posX >= maxPosition) {
+            s.posX = maxPosition;
+            s.finished = true;
+            s.time = formatTime(elapsedMilliseconds);
+            handleFinish(s, finishIndex);
+            finishIndex++;
+          }
+
+          // Move the swimmer element
+          const swimmerEl = document.getElementById(`swimmer-${s.id}`);
+          if (swimmerEl) {
+            swimmerEl.style.transform = `translateX(${s.posX}px)`;
+          }
+        }
+      });
+
+      if (allFinished) {
+        completeRace();
+      } else {
+        animationFrameId = requestAnimationFrame(runSimulation);
+      }
+    }
+
+    function handleFinish(swimmer, rank) {
+      playWallBeep(rank);
+
+      const avatarEl = document.querySelector(`#swimmer-${swimmer.id} .swimmer-avatar`);
+      if (avatarEl) {
+        avatarEl.classList.remove('swimming-active');
+        const ring = avatarEl.querySelector('.splash-ring');
+        if (ring) {
+          ring.classList.add('animate-ping');
+        }
+      }
+
+      // Slot into presentation breakdown
+      const slotCard = document.getElementById(`slot-card-${rank}`);
+      const speakerSlot = document.getElementById(`speaker-slot-${rank}`);
+      const timeSlot = document.getElementById(`time-slot-${rank}`);
+
+      if (slotCard && speakerSlot && timeSlot) {
+        slotCard.classList.remove('bg-slate-950/60', 'border-slate-800/80');
+        slotCard.classList.add('bg-gradient-to-r', 'from-orange-950/40', 'to-slate-900', 'border-swimOrange/70', 'shadow-lg', 'shadow-orange-500/15');
+        
+        speakerSlot.className = 'flex items-center gap-2 text-sm font-extrabold text-white';
+        speakerSlot.innerHTML = `
+          <span class="w-3 h-3 rounded-full bg-swimOrange shadow-sm shadow-orange-500/60"></span>
+          <span class="text-swimOrange">${swimmer.name}</span>
+          <span class="text-xs text-slate-400 font-medium">(Lane ${swimmer.id + 1})</span>
+        `;
+
+        timeSlot.className = 'text-xs font-mono-code text-amber-400 font-black';
+        timeSlot.textContent = swimmer.time;
+      }
+
+      document.getElementById('assignment-counter').textContent = `${finishIndex + 1}/5 LOCKED`;
+    }
+
+    function completeRace() {
+      raceStatus = 'completed';
+      cancelAnimationFrame(animationFrameId);
+      playFanfare();
+
+      document.getElementById('start-label').textContent = 'Completed';
+      document.getElementById('start-icon').textContent = '🏁';
+      document.getElementById('btn-start').disabled = true;
+      document.getElementById('btn-start').classList.add('opacity-50', 'cursor-not-allowed');
+
+      document.getElementById('race-stage-text').textContent = 'All 5 presentation sections locked top-down!';
+      document.getElementById('race-stage-text').className = 'font-bold text-emerald-400';
+
+      // Activate the Image Download button with animated pulse
+      const downloadBtn = document.getElementById('download-image-btn');
+      if (downloadBtn) {
+        downloadBtn.disabled = false;
+        downloadBtn.classList.remove('disabled:opacity-35', 'disabled:cursor-not-allowed', 'disabled:grayscale');
+        downloadBtn.classList.add('animate-pulse', 'ring-2', 'ring-amber-300/60');
+        setTimeout(() => downloadBtn.classList.remove('animate-pulse'), 2500);
+      }
+    }
+
+    function resetRace() {
+      cancelAnimationFrame(animationFrameId);
+      raceStatus = 'idle';
+      elapsedMilliseconds = 0;
+      finishIndex = 0;
+      document.getElementById('race-clock').textContent = '00:00.00';
+
+      const btnStart = document.getElementById('btn-start');
+      btnStart.disabled = false;
+      btnStart.classList.remove('opacity-50', 'cursor-not-allowed');
+      document.getElementById('start-label').textContent = 'Start Race';
+      document.getElementById('start-icon').textContent = '▶';
+
+      // Reset Download button state
+      const downloadBtn = document.getElementById('download-image-btn');
+      if (downloadBtn) {
+        downloadBtn.disabled = true;
+        downloadBtn.classList.remove('ring-2', 'ring-amber-300/60', 'animate-pulse');
+        document.getElementById('download-btn-text').textContent = 'Download Image (PNG)';
+      }
+
+      document.getElementById('race-stage-text').textContent = 'Swimmers on starting blocks';
+      document.getElementById('race-stage-text').className = 'font-bold text-slate-300';
+      document.getElementById('assignment-counter').textContent = '0/5 LOCKED';
+
+      swimmers.forEach(s => {
+        s.posX = 0;
+        s.finished = false;
+        s.time = null;
+        s.stamina = 1.0;
+        s.momentum = 1.0;
+        const swimmerEl = document.getElementById(`swimmer-${s.id}`);
+        if (swimmerEl) {
+          swimmerEl.style.transform = `translateX(0px)`;
+        }
+        const avatar = swimmerEl.querySelector('.swimmer-avatar');
+        if (avatar) {
+          avatar.classList.remove('swimming-active');
+          const ring = avatar.querySelector('.splash-ring');
+          if (ring) ring.classList.remove('animate-ping');
+        }
+      });
+
+      for (let i = 0; i < 5; i++) {
+        const slotCard = document.getElementById(`slot-card-${i}`);
+        const speakerSlot = document.getElementById(`speaker-slot-${i}`);
+        const timeSlot = document.getElementById(`time-slot-${i}`);
+
+        if (slotCard) {
+          slotCard.className = 'group relative rounded-2xl p-3 border transition-all duration-300 bg-slate-950/60 border-slate-800/80';
+        }
+        if (speakerSlot) {
+          speakerSlot.className = 'flex items-center gap-2 text-sm font-bold text-slate-500 italic';
+          speakerSlot.innerHTML = `<span>Waiting for ${i === 0 ? '1st' : i === 1 ? '2nd' : i === 2 ? '3rd' : (i + 1) + 'th'} touch...</span>`;
+        }
+        if (timeSlot) {
+          timeSlot.className = 'text-xs font-mono-code text-slate-500 font-semibold';
+          timeSlot.textContent = '--:--.--';
+        }
+      }
+
+      const copyBtn = document.getElementById('copy-btn-text');
+      copyBtn.textContent = 'Copy Agenda';
+    }
+
+    // High-Resolution Graphic Card Generator & Image Downloader (Off-screen Canvas)
+    function downloadLineupImage() {
+      const downloadBtnText = document.getElementById('download-btn-text');
+      const originalText = downloadBtnText.textContent;
+      downloadBtnText.textContent = 'Generating...';
+
+      // 1. Setup Canvas Dimensions (Crisp 2x Retina resolution)
+      const canvas = document.createElement('canvas');
+      const width = 1200;
+      const height = 1500;
+      canvas.width = width;
+      canvas.height = height;
+      const ctx = canvas.getContext('2d');
+
+      // Helper function for rounded rectangles
+      function roundRect(ctx, x, y, w, h, r, fill, stroke) {
+        ctx.beginPath();
+        ctx.moveTo(x + r, y);
+        ctx.arcTo(x + w, y, x + w, y + h, r);
+        ctx.arcTo(x + w, y + h, x, y + h, r);
+        ctx.arcTo(x, y + h, x, y, r);
+        ctx.arcTo(x, y, x + w, y, r);
+        ctx.closePath();
+        if (fill) ctx.fill();
+        if (stroke) ctx.stroke();
+      }
+
+      // Background Gradient
+      const bgGrad = ctx.createLinearGradient(0, 0, width, height);
+      bgGrad.addColorStop(0, '#090d16');
+      bgGrad.addColorStop(0.5, '#0d1527');
+      bgGrad.addColorStop(1, '#050810');
+      ctx.fillStyle = bgGrad;
+      ctx.fillRect(0, 0, width, height);
+
+      // Subtle Water Wave Accent at top
+      const waveGrad = ctx.createLinearGradient(0, 0, width, 0);
+      waveGrad.addColorStop(0, 'rgba(2, 132, 199, 0.25)');
+      waveGrad.addColorStop(0.5, 'rgba(255, 98, 0, 0.35)');
+      waveGrad.addColorStop(1, 'rgba(2, 132, 199, 0.25)');
+      ctx.fillStyle = waveGrad;
+      ctx.fillRect(0, 0, width, 18);
+
+      // Container Card Border
+      ctx.strokeStyle = '#1e293b';
+      ctx.lineWidth = 4;
+      roundRect(ctx, 40, 40, width - 80, height - 80, 36, false, true);
+
+      // Header Badge
+      ctx.fillStyle = 'rgba(255, 98, 0, 0.15)';
+      ctx.strokeStyle = 'rgba(255, 98, 0, 0.4)';
+      ctx.lineWidth = 2;
+      roundRect(ctx, (width - 360) / 2, 75, 360, 44, 22, true, true);
+
+      ctx.fillStyle = '#ff6200';
+      ctx.font = 'bold 20px "Plus Jakarta Sans", system-ui, sans-serif';
+      ctx.textAlign = 'center';
+      ctx.fillText('🏊 50M PRESENTATION SWIM-OFF', width / 2, 104);
+
+      // Main Title
+      ctx.fillStyle = '#ffffff';
+      ctx.font = '900 46px "Plus Jakarta Sans", system-ui, sans-serif';
+      ctx.fillText('OFFICIAL PRESENTATION ROSTER', width / 2, 175);
+
+      // Subtitle with timestamp
+      const nowStr = new Date().toLocaleDateString(undefined, { 
+        weekday: 'short', 
+        year: 'numeric', 
+        month: 'short', 
+        day: 'numeric' 
+      });
+      ctx.fillStyle = '#94a3b8';
+      ctx.font = '500 22px "Plus Jakarta Sans", system-ui, sans-serif';
+      ctx.fillText(`Orange Squad Regatta • Sequence Drawn Live • ${nowStr}`, width / 2, 215);
+
+      // Subtle divider line
+      ctx.strokeStyle = '#334155';
+      ctx.lineWidth = 2;
+      ctx.beginPath();
+      ctx.moveTo(90, 245);
+      ctx.lineTo(width - 90, 245);
+      ctx.stroke();
+
+      // Collect current results from DOM or data model
+      const results = [];
+      const placeLabels = ["1st Touch", "2nd Touch", "3rd Touch", "4th Touch", "5th Touch"];
+      for (let i = 0; i < 5; i++) {
+        const slot = presentationParts[i];
+        const speakerEl = document.querySelector(`#speaker-slot-${i} .text-swimOrange`);
+        const swimmerName = speakerEl ? speakerEl.textContent.trim() : `Finisher #${i + 1}`;
+        const timeEl = document.getElementById(`time-slot-${i}`);
+        const finishTime = timeEl ? timeEl.textContent.trim() : '--:--.--';
+        results.push({
+          num: i + 1,
+          place: placeLabels[i],
+          title: slot.title,
+          sub: slot.subtitle,
+          speaker: swimmerName,
+          time: finishTime
+        });
+      }
+
+      // Draw the 5 Cards Top-Down
+      const startY = 275;
+      const cardHeight = 195;
+      const cardGap = 24;
+
+      results.forEach((item, index) => {
+        const cardY = startY + index * (cardHeight + cardGap);
+        const cardX = 90;
+        const cardW = width - 180;
+
+        // Card background gradient
+        const cardBg = ctx.createLinearGradient(cardX, cardY, cardX + cardW, cardY);
+        cardBg.addColorStop(0, '#0f172a');
+        cardBg.addColorStop(0.7, '#141e33');
+        cardBg.addColorStop(1, '#1e1b18');
+        ctx.fillStyle = cardBg;
+        ctx.strokeStyle = '#ff6200';
+        ctx.lineWidth = 3;
+        roundRect(ctx, cardX, cardY, cardW, cardHeight, 24, true, true);
+
+        // Sequence badge box (Left)
+        ctx.fillStyle = 'rgba(255, 98, 0, 0.2)';
+        ctx.strokeStyle = 'rgba(255, 98, 0, 0.6)';
+        ctx.lineWidth = 2;
+        roundRect(ctx, cardX + 24, cardY + 24, 60, 60, 16, true, true);
+
+        ctx.fillStyle = '#ff6200';
+        ctx.font = '900 32px "Plus Jakarta Sans", sans-serif';
+        ctx.textAlign = 'center';
+        ctx.fillText(String(item.num), cardX + 54, cardY + 66);
+
+        // Presentation Topic & Subtitle
+        ctx.textAlign = 'left';
+        ctx.fillStyle = '#38bdf8';
+        ctx.font = '800 28px "Plus Jakarta Sans", sans-serif';
+        ctx.fillText(item.title, cardX + 104, cardY + 54);
+
+        ctx.fillStyle = '#94a3b8';
+        ctx.font = '600 20px "Plus Jakarta Sans", sans-serif';
+        ctx.fillText(item.sub, cardX + 104, cardY + 82);
+
+        // Place tag (Top right)
+        ctx.fillStyle = '#1e293b';
+        roundRect(ctx, cardX + cardW - 170, cardY + 26, 146, 36, 12, true, false);
+        ctx.fillStyle = '#f8fafc';
+        ctx.font = 'bold 16px "JetBrains Mono", monospace';
+        ctx.textAlign = 'center';
+        ctx.fillText(item.place, cardX + cardW - 97, cardY + 50);
+
+        // Horizontal internal divider
+        ctx.strokeStyle = '#1e293b';
+        ctx.lineWidth = 1.5;
+        ctx.beginPath();
+        ctx.moveTo(cardX + 24, cardY + 104);
+        ctx.lineTo(cardX + cardW - 24, cardY + 104);
+        ctx.stroke();
+
+        // Speaker Row
+        ctx.textAlign = 'left';
+        ctx.fillStyle = '#64748b';
+        ctx.font = '700 16px "Plus Jakarta Sans", sans-serif';
+        ctx.fillText('SPEAKER ASSIGNED:', cardX + 28, cardY + 144);
+
+        // Orange cap avatar circle
+        ctx.fillStyle = '#ff6200';
+        ctx.beginPath();
+        ctx.arc(cardX + 224, cardY + 148, 22, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.strokeStyle = '#ffffff';
+        ctx.lineWidth = 2;
+        ctx.stroke();
+
+        ctx.font = '20px sans-serif';
+        ctx.textAlign = 'center';
+        ctx.fillText('🏊', cardX + 224, cardY + 155);
+
+        // Speaker Name
+        ctx.textAlign = 'left';
+        ctx.fillStyle = '#ffffff';
+        ctx.font = '900 32px "Plus Jakarta Sans", sans-serif';
+        ctx.fillText(item.speaker, cardX + 260, cardY + 160);
+
+        // Touchpad Time Split (Bottom right)
+        ctx.textAlign = 'right';
+        ctx.fillStyle = '#fbbf24';
+        ctx.font = 'bold 22px "JetBrains Mono", monospace';
+        ctx.fillText(`⏱ ${item.time}`, cardX + cardW - 32, cardY + 158);
+      });
+
+      // Footer branding
+      ctx.textAlign = 'center';
+      ctx.fillStyle = '#64748b';
+      ctx.font = '500 17px "Plus Jakarta Sans", sans-serif';
+      ctx.fillText('Generated automatically by Orange Squad 50m Presentation Simulator', width / 2, height - 60);
+
+      // 2. Trigger PNG Download
+      try {
+        const imageURL = canvas.toDataURL('image/png');
+        const link = document.createElement('a');
+        link.download = `presentation-lineup-${new Date().toISOString().slice(0, 10)}.png`;
+        link.href = imageURL;
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+
+        downloadBtnText.textContent = '✓ Downloaded PNG!';
+        setTimeout(() => {
+          downloadBtnText.textContent = 'Download Image (PNG)';
+        }, 2500);
+      } catch (err) {
+        console.error("Image generation error:", err);
+        downloadBtnText.textContent = 'Download Image (PNG)';
+      }
+    }
+
+    function copyPresentationOrder() {
+      let text = "🏊 ORANGE SQUAD 50M PRESENTATION LINEUP\n=========================================\n";
+      for (let i = 0; i < 5; i++) {
+        const slotPart = presentationParts[i];
+        const speakerEl = document.querySelector(`#speaker-slot-${i} .text-swimOrange`);
+        const name = speakerEl ? speakerEl.textContent.trim() : "(Unassigned)";
+        const timeEl = document.getElementById(`time-slot-${i}`);
+        const time = timeEl ? timeEl.textContent.trim() : "";
+        text += `${i + 1}. [${slotPart.title}] ${slotPart.subtitle} -> Speaker: ${name} (${time})\n`;
+      }
+
+      const tempTextArea = document.createElement("textarea");
+      tempTextArea.value = text;
+      document.body.appendChild(tempTextArea);
+      tempTextArea.select();
+      try {
+        document.execCommand('copy');
+        const copyBtn = document.getElementById('copy-btn-text');
+        copyBtn.textContent = '✓ Copied to Clipboard!';
+        setTimeout(() => {
+          copyBtn.textContent = 'Copy Team Presentation Agenda';
+        }, 2200);
+      } catch (err) {
+        console.error("Unable to copy", err);
+      }
+      document.body.removeChild(tempTextArea);
+    }
+
+    window.addEventListener('resize', () => {
+      const trackElem = document.getElementById('track-0');
+      if (!trackElem) return;
+      const trackWidth = trackElem.clientWidth;
+      const maxPosition = Math.max(100, trackWidth - 110);
+      swimmers.forEach(s => {
+        if (s.finished) {
+          s.posX = maxPosition;
+          const swimmerEl = document.getElementById(`swimmer-${s.id}`);
+          if (swimmerEl) {
+            swimmerEl.style.transform = `translateX(${s.posX}px)`;
+          }
+        }
+      });
+    });
+
+    document.body.addEventListener('click', () => {
+      if (soundEnabled) getAudioContext();
+    }, { once: true });
+  </script>
+</body>
+</html>
